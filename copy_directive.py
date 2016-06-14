@@ -46,6 +46,10 @@ def copy_files():
     directory_list = [];
     inner_directory = '';
 
+    # Number of files and directories created.
+    directory_count = 0;
+    files_count = 0;
+
     # Write the file_structure in a file.
     file_structure = open('file_structure.txt', 'w');
 
@@ -53,20 +57,23 @@ def copy_files():
     for (pathname, dirname, filename) in os.walk(directory_from_path):
         file_structure.write('Directory: ' + str(dirname) + ' File: ' + str(filename) + '\n');
         for directory in dirname:
+            directory_count += 1;
             create_directory(directory_to_path + inner_directory + directory + '/');
         for file_name in filename:
-            if file_name != '.DS_Store': # Don't copy mac temp files.
+            if file_name.find('DS_Store') == -1: # Don't copy mac temp files.
+                files_count += 1;
                 read_from = open(pathname + '/' + file_name, 'r');
                 write_to = open(directory_to_path + inner_directory + file_name, 'w');
                 write_to.write(read_from.read());
                 read_from.close();
                 write_to.close();
-            else:
-                print '-------- Got mac temp file: ' + file_name + ' ------------';
         for index in range(len(dirname), 0, -1):
             directory_list.append(inner_directory + dirname[index - 1]);
         if len(directory_list):
             inner_directory =  directory_list.pop() + '/';
+
+        # Print number of files copied.
+        print '\rCopied %s files and %s folders.' %(files_count, directory_count),;
 
     file_structure.close();
 
